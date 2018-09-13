@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"encoding/json"
+	"fmt"
 )
 
 type (
@@ -13,6 +14,20 @@ type (
 	}
 )
 
+func handlePost(w http.ResponseWriter, r *http.Request){
+	err := r.ParseForm()
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+	fmt.Fprintf(w, "Post from website! r.PostFrom = %v\n", r.PostForm)
+	//fname := "default"
+	if r.FormValue("name") != ""{
+		//fname = r.FormValue("name")
+	}
+
+	w.Write([]byte(fmt.Sprintf("fname: %s", r.FormValue("name"))))
+}
 func handleTest(w http.ResponseWriter, r *http.Request){
 
 	names, ok := r.URL.Query()["fname"]
@@ -34,9 +49,12 @@ func handleTest(w http.ResponseWriter, r *http.Request){
 	w.Write(respSer)
 }
 
-
 func main(){
 
-	http.HandleFunc("/test", handleTest);
+
+
+	http.HandleFunc("/test", handleTest)
+	http.HandleFunc("/testPost", handlePost)
+
 	http.ListenAndServe(":8080", nil)
 }
