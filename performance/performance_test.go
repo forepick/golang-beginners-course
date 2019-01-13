@@ -4,11 +4,16 @@ import (
 	"testing"
 	"time"
 	"fmt"
+	"runtime"
 )
 
 
 func TestPerformance(t *testing.T){
 	N := 10000000
+	return
+
+	fmt.Println(runtime.NumCPU())
+
 	start := time.Now()
 
 	implementation := 0
@@ -43,6 +48,7 @@ func SerialImpl(N int){
 func SimpleConcurrencyImpl(N int){
 
 	ack := make(chan bool, N)
+
 	for i := 0; i < N; i++ {
 		go func(arg int) {
 			Task(arg)
@@ -65,12 +71,11 @@ func WorkersImpl(N int){
 	for i := 0; i < N; i++ {
 		workers <- i
 	}
-
 }
 
 
 func WorkerPool(task func(int), callback func()) chan int {
-	poolSize := 100
+	poolSize := 1000
 
 	ack := make(chan bool, poolSize)
 
@@ -101,7 +106,7 @@ func WorkerPool(task func(int), callback func()) chan int {
 }
 
 func BatchingImpl(N int){
-	var batchSize = 100000
+	var batchSize = 2500000
 	var WorkersCount = N / batchSize
 	fmt.Printf("goroutines spawned: %d\n", WorkersCount)
 	var ack = make(chan bool, WorkersCount)

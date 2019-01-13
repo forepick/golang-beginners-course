@@ -40,12 +40,17 @@ func TestBurstLimiter(t *testing.T) {
 	for i := 0; i < burstLimit; i++ {
 		bucket <- time.Now()
 	}
-
 	go func(){
 		for {
 			bucket <- <- tick
 		}
 	}()
+
+	success := true
+	if success  {
+		fmt.Println("task completed successfully")
+	}
+
 
 	for task := range tasks {
 		<- bucket

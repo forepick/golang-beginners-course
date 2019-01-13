@@ -5,6 +5,14 @@ import (
 	"testing"
 )
 
+func TestDefer(t *testing.T){
+
+	val := 10
+	defer fmt.Println("Function completed 1")
+	defer fmt.Println("Function completed 2")
+
+	fmt.Println(val)
+}
 
 func TestDeferStacking(t *testing.T){
 	for i := 0; i < 10; i ++ {
@@ -21,3 +29,4 @@ func TestRecovery(t *testing.T){
 	}()
 	panic("Panic Example")
 }
+

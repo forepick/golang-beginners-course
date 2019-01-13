@@ -40,16 +40,21 @@ func TestSelect(t *testing.T){
 	c2 := make(chan int, 3)
 
 	go func(){
-		select{
-		case a := <- c1:
-			fmt.Printf("c1 gave %d\n", a)
-		case a := <- c2:
-			fmt.Printf("c2 gave %d\n", a)
+		for {
+			select {
+			case a := <-c1:
+				fmt.Printf("c1 gave %d\n", a)
+			case a := <-c2:
+				fmt.Printf("c2 gave %d\n", a)
+			default:
+				fmt.Println("No values")
+				time.Sleep(500 * time.Millisecond)
+			}
 		}
 	}()
-
 	time.Sleep(3 * time.Second)
-	c2 <- 2
+	c1 <- 2
+	time.Sleep(1 * time.Second)
 }
 
 func TestTicker(t *testing.T){
@@ -62,6 +67,4 @@ func TestTicker(t *testing.T){
 	}()
 
 	time.Sleep(20 * time.Second)
-
-
 }
