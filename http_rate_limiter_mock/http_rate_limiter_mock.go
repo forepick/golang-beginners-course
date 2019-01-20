@@ -41,7 +41,6 @@ func getHandler(burstSize int, maxRps float64) func(request string) int{
 			return 200
 		default:
 			return 429
-
 		}
 	}
 

@@ -1,22 +1,20 @@
-package performance
+package main
 
 import (
-	"testing"
 	"time"
 	"fmt"
 	"runtime"
 )
 
 
-func TestPerformance(t *testing.T){
+func main(){
 	N := 10000000
-	return
 
 	fmt.Println(runtime.NumCPU())
 
 	start := time.Now()
 
-	implementation := 0
+	implementation := 4
 
 	switch implementation {
 	case 0:
@@ -24,8 +22,10 @@ func TestPerformance(t *testing.T){
 	case 1:
 		SimpleConcurrencyImpl(N)
 	case 2:
-		WorkersImpl(N)
+		SingleWorkerImpl(N)
 	case 3:
+		WorkersImpl(N)
+	case 4:
 		BatchingImpl(N)
 	}
 
@@ -43,6 +43,26 @@ func SerialImpl(N int){
 	for i := 0; i < N; i++ {
 		Task(i)
 	}
+}
+
+func SingleWorkerImpl(N int){
+	input := make(chan int, N)
+	exit := make(chan bool)
+	for i := 0; i < N; i++ {
+		input <- i
+	}
+	go func(){
+		for{
+			select {
+				case v := <- input:
+					Task(v)
+				default:
+					exit <- true
+
+			}
+		}
+	}()
+	<- exit
 }
 
 func SimpleConcurrencyImpl(N int){
@@ -63,33 +83,37 @@ func SimpleConcurrencyImpl(N int){
 func WorkersImpl(N int){
 
 	exit := make(chan bool)
-	workers := WorkerPool(func(a int) {
+	input := make(chan int, N)
+	for i := 0; i < N; i++ {
+		input <- i
+	}
+	fmt.Println("Done submitting tasks")
+
+	WorkerPool(input, func(a int) {
 		Task(a)
 	}, func(){
 		exit <- true
 	})
-	for i := 0; i < N; i++ {
-		workers <- i
-	}
+
+	<-exit
 }
 
 
-func WorkerPool(task func(int), callback func()) chan int {
-	poolSize := 1000
+func WorkerPool(input chan int, task func(int), callback func()) chan int {
+	poolSize := 4
 
 	ack := make(chan bool, poolSize)
 
 	fmt.Printf("goroutines spawned: %d\n", poolSize)
-	input := make(chan int)
 	for i := 0; i < poolSize; i++ {
 		go func() {
 			for {
-				v, ok := <-input
-				if ok {
-					task(v)
-				} else {
-					ack <- true
-					return
+				select {
+					case v := <- input:
+						task(v)
+					default:
+						ack <- true
+						return
 				}
 			}
 		}()
@@ -99,6 +123,7 @@ func WorkerPool(task func(int), callback func()) chan int {
 		for i := 0; i < poolSize; i++ {
 			<-ack
 		}
+		fmt.Println("All workers completed")
 		callback()
 	}()
 
