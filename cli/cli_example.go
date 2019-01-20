@@ -42,7 +42,4 @@ func main() {
 	}
 
 	fmt.Printf("Config object: %+v\n", config)
-
-
-
 }
