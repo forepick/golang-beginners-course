@@ -13,8 +13,7 @@ func main() {
 
 	// ************ Request simulation **********
 	requestTicker := time.Tick(200 * time.Millisecond)
-	for{
-		<- requestTicker
+	for range requestTicker{
 		fmt.Printf("Got %d status\n", handler("request Body"))
 	}
 

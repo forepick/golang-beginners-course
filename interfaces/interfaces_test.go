@@ -36,6 +36,7 @@ func TestNilUnderlyingInterfaceValue(test *testing.T) {
 
 func TestNilInterfaceValue(test *testing.T) {
 	var i I
+	fmt.Printf("hi %v", i)
 	describe(i)
 	i.M()
 }

@@ -1,27 +1,35 @@
 package main
 
 import (
-	"time"
 	"fmt"
 )
 
-func main() {
+func workerFunc(id int, input <-chan string, success chan<- bool){
+	for task := range input {
+		fmt.Printf("Worker %d started working...\n", id)
+		//time.Sleep(1 * time.Second)
+		fmt.Printf("Worker %d completed \"%s\"\n", id, task)
+		success <- true
+	}
+}
+const NUM_OF_WORKERS = 10
 
-	done := make(chan bool)
+func main(){
+	tasks := make(chan string, 10)
+	acks := make(chan bool)
 
-	go func(complete chan bool){
-		for i := 0; i < 10; i++ {
-			println(i)
-			time.Sleep(500 * time.Millisecond)
-		}
+	for i := 0; i < NUM_OF_WORKERS; i++ {
+		go workerFunc(i, tasks, acks)
+	}
 
-		complete <- true
+	for i := 0; i < NUM_OF_WORKERS; i++ {
+		tasks <- fmt.Sprintf("Task #%d", i)
+	}
+	for i := 0; i < NUM_OF_WORKERS; i++ {
+		<- acks
+	}
 
-	}(done)
-
-	<- done
-
-	fmt.Println("Task completed")
+	fmt.Println("execution completed")
 
 
 }

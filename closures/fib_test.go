@@ -1,8 +1,8 @@
 package closures
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 // fibonacci is a function that returns
@@ -16,6 +16,7 @@ func fibonacci() func() int {
 		x = x1 + x2
 		x2 = x1
 		x1 = x
+
 		return ret
 	}
 }

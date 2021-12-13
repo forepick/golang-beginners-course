@@ -1,8 +1,8 @@
 package data_structures
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 	"time"
 )
 func BenchmarkSomething(b *testing.B){

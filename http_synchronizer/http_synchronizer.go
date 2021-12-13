@@ -8,9 +8,10 @@ func main(){
 
 	requestIds := make(map[string]chan string)
 
-	http.HandleFunc("/test/service2", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/test/service", func(w http.ResponseWriter, r *http.Request) {
 
 		ids, ok := r.URL.Query()["id"]
+
 		if !ok {
 			w.WriteHeader(400)
 			return
@@ -25,6 +26,7 @@ func main(){
 		c := requestIds[id]
 
 		<- c
+
 		w.Write([]byte("Response"))
 	})
 
@@ -46,7 +48,11 @@ func main(){
 		}
 		c := requestIds[id]
 		c <- "Message from callback"
+
+		delete(requestIds, id)
+
 		w.Write([]byte("OK"))
 	})
+
 	http.ListenAndServe(":8080", nil)
 }

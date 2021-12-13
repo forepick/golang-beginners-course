@@ -27,6 +27,7 @@ func TestRecovery(t *testing.T){
 			fmt.Printf("recovered from a panic: %s\n", r)
 		}
 	}()
+
 	panic("Panic Example")
 }
 
